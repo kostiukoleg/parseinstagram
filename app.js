@@ -1,17 +1,22 @@
 const express = require('express');
 const authRoutes = require('./routes/auth');
+const categoryRoutes = require('./routes/category');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const keys = require('./config/keys');
 const mongoose = require('mongoose');
+const passport = require('passport');
 const app = express();
+mongoose.set('useCreateIndex', true);
 
-mongoose.connect(keys.mongoURI).then(()=>console.log('Mongo DB connected')).catch(error=>console.log(error));
+mongoose.connect(keys.mongoURI, {useUnifiedTopology: true, useNewUrlParser: true, }).then(()=>console.log('Mongo DB connected')).catch(error=>console.log(error));
+app.use(passport.initialize());
+require('./middleware/passport')(passport);
 app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
-
+app.use('/api/category', categoryRoutes);
 module.exports = app;
